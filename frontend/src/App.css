@@ -82,6 +82,96 @@
   color: var(--texto-suave);
 }
 
+/* ---------- Pantalla de login ---------- */
+
+/* Contenedor de pantalla completa que CENTRA la tarjeta de login.
+   display: flex + place-items/content center = centrado vertical y
+   horizontal. min-height: 100svh = ocupa toda la altura visible. */
+.login-pantalla {
+  min-height: 100svh;
+  display: flex;
+  align-items: center; /* centrado vertical */
+  justify-content: center; /* centrado horizontal */
+  padding: 20px;
+  box-sizing: border-box;
+  /* Fondo bordó degradado, para que el login tenga presencia */
+  background: linear-gradient(160deg, var(--bordo) 0%, var(--bordo-oscuro) 100%);
+}
+
+/* La tarjeta blanca del formulario. display: flex + column + gap
+   apila los campos con espacio parejo entre sí. */
+.login-card {
+  background-color: var(--blanco);
+  border-radius: 12px;
+  box-shadow: var(--sombra);
+  padding: 32px 28px;
+  width: 100%;
+  max-width: 380px; /* que no se estire de más en pantallas grandes */
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  box-sizing: border-box;
+}
+
+.login-card h1 {
+  margin: 0;
+  font-size: 24px;
+  color: var(--bordo); /* el título en bordó, toque institucional */
+  text-align: center;
+}
+
+.login-subtitulo {
+  margin: 0 0 8px;
+  font-size: 14px;
+  color: var(--texto-suave);
+  text-align: center;
+}
+
+/* El label envuelve al input (por eso al hacer clic en el texto se
+   enfoca el campo). flex column apila etiqueta arriba, campo abajo. */
+.login-label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--texto);
+}
+
+.login-label input {
+  padding: 10px 12px;
+  border: 1px solid var(--borde);
+  border-radius: 8px;
+  font-size: 15px;
+  font-family: inherit; /* que use la misma fuente que el resto */
+}
+
+/* :focus = cuando el campo está seleccionado: borde bordó en vez
+   del contorno azul por defecto del navegador. */
+.login-label input:focus {
+  outline: 2px solid var(--bordo);
+  outline-offset: -1px;
+  border-color: var(--bordo);
+}
+
+.login-boton {
+  margin-top: 8px;
+  padding: 12px;
+  background-color: var(--bordo);
+  color: var(--blanco);
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer; /* manito al pasar por encima */
+}
+
+/* :hover = al pasar el mouse: bordó más oscuro, da sensación de botón */
+.login-boton:hover {
+  background-color: var(--bordo-oscuro);
+}
+
 /* ---------- Badge de estado ---------- */
 
 /* Estilo base compartido por todos los estados: pastilla redondeada.
