@@ -77,3 +77,25 @@ Datos recopilados del portal de Gestión. Fuente oficial, no modificar sin verif
 - Programación de redes (6498):
     requiere: Diseño de aplicaciones 1 (3924), Sistemas operativos (6409)
     requisito de créditos: 12 materias del título aprobadas
+
+## Materias base y de gestión (sin previas)
+
+- Álgebra lineal (2103):
+    requiere: ninguna
+    requisito de créditos: ninguno
+
+- Cálculo en una variable (7660):
+    requiere: ninguna
+    requisito de créditos: ninguno
+
+- Administración general (1781):
+    requiere: ninguna
+    requisito de créditos: 9 materias del título aprobadas
+
+- Finanzas y valoración de proyectos (6411):
+    requiere: ninguna
+    requisito de créditos: 16 materias del título aprobadas
+
+- Economía y organización empresarial (7668):
+    requiere: ninguna
+    requisito de créditos: 9 materias del título aprobadas
