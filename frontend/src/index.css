@@ -1,0 +1,53 @@
+/* ============================================================
+   index.css — estilos GLOBALES de la app
+   Acá va lo que afecta a toda la página: paleta de colores,
+   tipografía y fondo. Lo específico de cada parte va en App.css.
+   ============================================================ */
+
+/* :root son las "variables CSS" globales. Definimos la paleta una
+   sola vez acá y después la usamos con var(--nombre) donde queramos.
+   Si mañana cambiamos el bordó, se cambia en un solo lugar. */
+:root {
+  /* Paleta institucional inspirada en ORT */
+  --bordo: #8b1d41; /* color principal (vino tinto) */
+  --bordo-oscuro: #6e1734; /* variante para hovers/detalles */
+  --fondo: #f6f4f5; /* fondo general, gris muy claro y cálido */
+  --blanco: #ffffff; /* fondo de las tarjetas */
+  --texto: #2b2b2e; /* texto principal, casi negro (legible) */
+  --texto-suave: #6f6a6d; /* texto secundario (código, semestre) */
+  --borde: #e4dfe1; /* bordes sutiles */
+
+  /* Colores de los estados (badge) */
+  --aprobado-bg: #e3f4e6;
+  --aprobado-texto: #1d6b2f;
+  --cursando-bg: #fdf0d7;
+  --cursando-texto: #92600a;
+  --sin-aprobar-bg: #ececec;
+  --sin-aprobar-texto: #5f5f5f;
+
+  /* Sombra suave para las tarjetas */
+  --sombra: 0 1px 3px rgba(0, 0, 0, 0.08), 0 4px 12px rgba(0, 0, 0, 0.06);
+
+  /* Tipografía base de toda la app */
+  font-family: system-ui, 'Segoe UI', Roboto, sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--texto);
+  background-color: var(--fondo);
+
+  /* Forzamos tema claro: la demo de Vite se adaptaba al modo oscuro
+     del sistema; nuestro panel institucional es claro siempre. */
+  color-scheme: light;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* El navegador le pone margen al body por defecto; lo sacamos para
+   que el header bordó llegue hasta los bordes de la ventana. */
+body {
+  margin: 0;
+}
+
+/* #root es el div de index.html donde React monta toda la app. */
+#root {
+  min-height: 100svh; /* que ocupe al menos toda la altura visible */
+}

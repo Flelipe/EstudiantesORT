@@ -1,0 +1,112 @@
+/* ============================================================
+   App.css — estilos del componente App
+   Header, tarjetas de materias y badges de estado.
+   Los colores vienen de las variables definidas en index.css.
+   ============================================================ */
+
+/* ---------- Header ---------- */
+
+/* Franja bordó de arriba, estilo panel institucional. */
+.header {
+  background-color: var(--bordo);
+  color: var(--blanco);
+  padding: 24px 32px;
+  box-shadow: var(--sombra);
+}
+
+.header h1 {
+  margin: 0;
+  font-size: 26px;
+  font-weight: 600;
+  letter-spacing: -0.3px;
+}
+
+.header p {
+  margin: 4px 0 0;
+  font-size: 15px;
+  opacity: 0.85; /* el subtítulo un poco más apagado que el título */
+}
+
+/* ---------- Contenido ---------- */
+
+/* Contenedor centrado: max-width evita que en pantallas grandes
+   las tarjetas se estiren de punta a punta; margin auto lo centra. */
+.contenido {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 32px 20px;
+}
+
+/* La lista <ul>: le sacamos las viñetas y el padding por defecto.
+   display: flex + column + gap = tarjetas apiladas con espacio entre sí. */
+.lista-materias {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* ---------- Tarjeta de materia ---------- */
+
+/* Cada <li> es una tarjeta: fondo blanco, bordes redondeados y sombra.
+   display: flex + justify-content: space-between empuja la info a la
+   izquierda y el badge de estado a la derecha. */
+.card {
+  background-color: var(--blanco);
+  border: 1px solid var(--borde);
+  border-radius: 10px;
+  box-shadow: var(--sombra);
+  padding: 16px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+
+  /* Detalle institucional: filito bordó en el borde izquierdo */
+  border-left: 4px solid var(--bordo);
+}
+
+.card h2 {
+  margin: 0 0 4px;
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--texto);
+}
+
+/* Línea secundaria: código y semestre, más chico y apagado. */
+.card .detalle {
+  margin: 0;
+  font-size: 14px;
+  color: var(--texto-suave);
+}
+
+/* ---------- Badge de estado ---------- */
+
+/* Estilo base compartido por todos los estados: pastilla redondeada.
+   white-space: nowrap evita que "sin aprobar" se corte en dos líneas. */
+.badge {
+  font-size: 13px;
+  font-weight: 600;
+  padding: 4px 12px;
+  border-radius: 999px; /* un radio enorme = pastilla perfecta */
+  white-space: nowrap;
+}
+
+/* Una clase por estado, solo cambian los colores.
+   El nombre de la clase se arma en App.tsx según el estado. */
+.badge-aprobado {
+  background-color: var(--aprobado-bg);
+  color: var(--aprobado-texto);
+}
+
+.badge-cursando {
+  background-color: var(--cursando-bg);
+  color: var(--cursando-texto);
+}
+
+.badge-sin-aprobar {
+  background-color: var(--sin-aprobar-bg);
+  color: var(--sin-aprobar-texto);
+}
