@@ -10,7 +10,11 @@
 // tipo) debe tener un objeto — no genera código, solo lo describe.
 
 export interface Materia {
-  // acá van los campos: nombre, codigo, semestre, estado
+  // acá van los campos:
+  nombre: string;
+  codigo: string;
+  semestre: number;
+  estado: "sin aprobar" | "cursando" | "aprobado"; 
 }
 
 // ------------------------------------------------------------
