@@ -6,11 +6,12 @@ import { useState } from 'react'
 // Lo importamos con "type" porque es solo un tipo de TypeScript.
 import type { SubmitEvent } from 'react'
 
-// Importamos la interface Materia desde types.ts (en la raíz del proyecto).
-// "../.." significa: subir de src/ a frontend/, y de frontend/ a la raíz.
-// Usamos "import type" porque Materia es solo un tipo (no es código que se
-// ejecute), y la config de TypeScript de Vite pide marcarlo explícitamente.
-import type { Materia } from '../../types'
+// Importamos las materias REALES del plan desde el archivo de datos.
+// Ojo: este import es distinto al "import type" que teníamos antes:
+// acá importamos un VALOR (el array con los datos), no un tipo.
+// Ya no necesitamos importar la interface Materia en este archivo,
+// porque el array ya viene tipado como Materia[] desde materias.ts.
+import { materias } from './data/materias'
 
 // Importamos los estilos del componente. Con Vite, importar un .css
 // hace que esos estilos se apliquen a la página.
@@ -36,16 +37,6 @@ function App() {
   // React guarda lo que el usuario escribe (ver los input más abajo).
   const [numeroEstudiante, setNumeroEstudiante] = useState('')
   const [contrasena, setContrasena] = useState('')
-
-  // Materias de ejemplo, hardcodeadas por ahora (después vendrán del
-  // backend). ": Materia[]" = array de objetos con la forma de la interface.
-  const materias: Materia[] = [
-    { nombre: 'Programación 1', codigo: 'P1', semestre: 1, estado: 'aprobado' },
-    { nombre: 'Matemática discreta 1', codigo: 'MD1', semestre: 1, estado: 'aprobado' },
-    { nombre: 'Programación 2', codigo: 'P2', semestre: 2, estado: 'cursando' },
-    { nombre: 'Cálculo 1', codigo: 'C1', semestre: 2, estado: 'cursando' },
-    { nombre: 'Álgebra lineal', codigo: 'AL', semestre: 3, estado: 'sin aprobar' },
-  ]
 
   // Función que se ejecuta al enviar el formulario de login.
   // e.preventDefault() frena el comportamiento por defecto del navegador
@@ -136,7 +127,14 @@ function App() {
               <div>
                 <h2>{materia.nombre}</h2>
                 <p className="detalle">
-                  {materia.codigo} · Semestre {materia.semestre}
+                  {/* Operador ternario: condición ? siAsí : siNo.
+                      semestre 0 es nuestro marcador de "sin confirmar"
+                      (las 3 materias de gestión), así que en ese caso
+                      mostramos un texto en vez de un "Semestre 0" falso. */}
+                  {materia.codigo} ·{' '}
+                  {materia.semestre === 0
+                    ? 'Semestre a confirmar'
+                    : `Semestre ${materia.semestre}`}
                 </p>
               </div>
 
