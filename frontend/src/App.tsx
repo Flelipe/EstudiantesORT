@@ -7,11 +7,15 @@ import { useState } from 'react'
 import type { SubmitEvent } from 'react'
 
 // Importamos las materias REALES del plan desde el archivo de datos.
-// Ojo: este import es distinto al "import type" que teníamos antes:
-// acá importamos un VALOR (el array con los datos), no un tipo.
-// Ya no necesitamos importar la interface Materia en este archivo,
-// porque el array ya viene tipado como Materia[] desde materias.ts.
-import { materias } from './data/materias'
+// El "as materiasIniciales" RENOMBRA el import dentro de este archivo:
+// el array de datos pasa a llamarse materiasIniciales acá, para que no
+// choque con el estado "materias" que creamos abajo con useState.
+// El nombre lo dice todo: es el valor INICIAL, la foto de arranque.
+import { materias as materiasIniciales } from './data/materias'
+
+// Volvemos a necesitar la interface Materia: la usamos para tipar
+// el estado nuevo que elige el usuario en el <select>.
+import type { Materia } from '../../types'
 
 // Importamos los estilos del componente. Con Vite, importar un .css
 // hace que esos estilos se apliquen a la página.
@@ -37,6 +41,47 @@ function App() {
   // React guarda lo que el usuario escribe (ver los input más abajo).
   const [numeroEstudiante, setNumeroEstudiante] = useState('')
   const [contrasena, setContrasena] = useState('')
+
+  // ============================================================
+  // LAS MATERIAS AHORA SON ESTADO
+  // ============================================================
+  // Antes usábamos el array importado directo. El problema: si el
+  // usuario cambia el estado de una materia, ese cambio tiene que
+  // REDIBUJAR la pantalla — y React solo redibuja cuando cambia un
+  // estado (useState). Un array importado es "invisible" para React.
+  //
+  // Por eso: useState(materiasIniciales) crea el estado "materias"
+  // usando el array importado como valor de ARRANQUE. A partir de acá,
+  // la app entera lee de "materias" (el estado) y lo cambia SOLO con
+  // setMaterias. El archivo materias.ts queda como la foto inicial.
+  const [materias, setMaterias] = useState(materiasIniciales)
+
+  // Cambia el estado de UNA materia, identificada por su código.
+  // Materia['estado'] es un "tipo indexado": le pedimos a TypeScript
+  // el tipo del campo estado de la interface, o sea el union
+  // "sin aprobar" | "cursando" | "aprobado". Así, si mañana agregás
+  // un estado nuevo a la interface, esta función lo acepta sola.
+  //
+  // ¿Por qué NO mutar? (regla clave de React)
+  // ❌ materia.estado = nuevoEstado  → muta el objeto existente.
+  //    React compara el array nuevo con el viejo por REFERENCIA
+  //    (¿es el mismo array u otro?). Si mutás adentro, el array sigue
+  //    siendo "el mismo" y React puede no enterarse → no redibuja.
+  // ✅ .map() crea un array NUEVO, y para la materia que cambia
+  //    creamos un objeto NUEVO. React ve "array distinto" → redibuja.
+  //
+  // { ...m, estado: nuevoEstado } es "spread": copiá todos los campos
+  // de m tal cual, y pisá estado con el valor nuevo. Copia + cambio
+  // en una sola expresión.
+  function cambiarEstado(codigo: string, nuevoEstado: Materia['estado']) {
+    setMaterias(
+      materias.map((m) =>
+        // ¿Es la materia que el usuario tocó? → objeto nuevo con el
+        // estado nuevo. ¿No es? → la dejamos pasar tal cual.
+        m.codigo === codigo ? { ...m, estado: nuevoEstado } : m
+      )
+    )
+  }
 
   // Función que se ejecuta al enviar el formulario de login.
   // e.preventDefault() frena el comportamiento por defecto del navegador
@@ -138,13 +183,49 @@ function App() {
                 </p>
               </div>
 
-              {/* Badge de estado: la clase se arma dinámicamente con
-                  template literals; .replace(' ', '-') convierte
-                  "sin aprobar" en "sin-aprobar" (las clases CSS no
-                  admiten espacios). Cada clase tiene su color. */}
-              <span className={`badge badge-${materia.estado.replace(' ', '-')}`}>
-                {materia.estado}
-              </span>
+              {/* Columna derecha de la tarjeta: badge arriba, select abajo.
+                  style={{...}} es un ESTILO INLINE en JSX: la primera llave
+                  es "acá va JavaScript" y la segunda es un objeto con las
+                  propiedades CSS (en camelCase: flexDirection, no flex-direction).
+                  Lo usamos acá por ser poquitas líneas; si crece, va a App.css. */}
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '8px' }}>
+                {/* Badge de estado: la clase se arma dinámicamente con
+                    template literals; .replace(' ', '-') convierte
+                    "sin aprobar" en "sin-aprobar" (las clases CSS no
+                    admiten espacios). Cada clase tiene su color. */}
+                <span className={`badge badge-${materia.estado.replace(' ', '-')}`}>
+                  {materia.estado}
+                </span>
+
+                {/* SELECT CONTROLADO: mismo circuito que los inputs del login.
+                    - value={materia.estado} → el select muestra el estado
+                      actual de ESTA materia (el dato manda sobre la pantalla).
+                    - onChange → cuando el usuario elige otra opción,
+                      llamamos a cambiarEstado con el código de esta materia
+                      y el valor elegido (e.target.value).
+                    - "as Materia['estado']": e.target.value llega como string
+                      genérico; le decimos a TS "confiá, es uno de los tres
+                      estados válidos" — seguro acá porque las <option> solo
+                      pueden ser esos tres valores. */}
+                <select
+                  value={materia.estado}
+                  onChange={(e) => cambiarEstado(materia.codigo, e.target.value as Materia['estado'])}
+                  style={{
+                    padding: '4px 8px',
+                    borderRadius: '6px',
+                    border: '1px solid var(--borde)',
+                    fontFamily: 'inherit',
+                    fontSize: '13px',
+                    color: 'var(--texto)',
+                    backgroundColor: 'var(--blanco)',
+                    cursor: 'pointer',
+                  }}
+                >
+                  <option value="sin aprobar">sin aprobar</option>
+                  <option value="cursando">cursando</option>
+                  <option value="aprobado">aprobado</option>
+                </select>
+              </div>
             </li>
           ))}
         </ul>
