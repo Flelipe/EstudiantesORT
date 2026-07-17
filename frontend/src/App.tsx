@@ -237,6 +237,25 @@ function App() {
     )
   }
 
+  // ============================================================
+  // % DE CARRERA — dato DERIVADO (no es estado)
+  // ============================================================
+  // Esto NO va en un useState. ¿Por qué? Porque se puede CALCULAR
+  // a partir de las materias, que ya son estado. Si lo guardáramos
+  // aparte, habría que acordarse de actualizarlo en cada cambio
+  // (propenso a bugs y a que quede desincronizado). Calculándolo acá,
+  // en cada render, siempre está correcto solo: cambia una materia →
+  // React re-ejecuta App() → estas líneas se recalculan → listo.
+  // Es el principio de "una sola fuente de verdad": el estado guarda
+  // lo MÍNIMO, y todo lo deducible se deriva.
+  //
+  // ⚠️ PROVISORIO: calcula sobre las 33 materias cargadas. El plan
+  // real tiene además materias genéricas/electivas (ver Plan2019.pdf),
+  // así que el total a futuro no es exactamente 33. Refinar cuando
+  // definamos cómo contar electivas.
+  const aprobadas = materias.filter((m) => m.estado === 'aprobado').length
+  const porcentaje = Math.round((aprobadas / materias.length) * 100)
+
   // Si llegamos hasta acá es porque sesionIniciada es true:
   // se muestra la app de siempre, con la lista de materias.
   return (
@@ -247,6 +266,44 @@ function App() {
       </header>
 
       <main className="contenido">
+        {/* Panel de progreso: usa los valores DERIVADOS calculados arriba.
+            No hay ningún estado nuevo acá — cuando cambiás una materia
+            en el select, React redibuja y esta barra se actualiza sola. */}
+        <section
+          className="card"
+          style={{ flexDirection: 'column', alignItems: 'stretch', marginBottom: '20px' }}
+        >
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+            <h2 style={{ margin: 0, fontSize: '16px' }}>Progreso de la carrera</h2>
+            <span style={{ fontWeight: 600, color: 'var(--bordo)' }}>
+              {/* aprobadas de un total provisorio de 33 (ver comentario arriba) */}
+              {aprobadas} / {materias.length} · {porcentaje}%
+            </span>
+          </div>
+
+          {/* Barra de progreso "a mano": un riel gris de fondo, y adentro
+              un relleno bordó cuyo ANCHO es el porcentaje. width dinámico
+              con template literal: `${porcentaje}%` → ej: "42%". */}
+          <div
+            style={{
+              backgroundColor: 'var(--sin-aprobar-bg)',
+              borderRadius: '999px',
+              height: '10px',
+              overflow: 'hidden', // recorta el relleno a los bordes redondeados
+            }}
+          >
+            <div
+              style={{
+                backgroundColor: 'var(--bordo)',
+                height: '100%',
+                width: `${porcentaje}%`,
+                borderRadius: '999px',
+                transition: 'width 0.3s', // animación suave al cambiar
+              }}
+            />
+          </div>
+        </section>
+
         <ul className="lista-materias">
           {/* .map() recorre el array y transforma cada materia en un <li>
               (una tarjeta). key={materia.codigo} le da a React un
