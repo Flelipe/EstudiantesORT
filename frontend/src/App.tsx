@@ -1,7 +1,9 @@
 // useState es un "hook" de React: una función especial que nos deja
-// guardar datos que pueden CAMBIAR con el tiempo (estado). Hay que
-// importarlo desde 'react' para poder usarlo.
-import { useState } from 'react'
+// guardar datos que pueden CAMBIAR con el tiempo (estado).
+// useEffect es OTRO hook: sirve para ejecutar código "aparte" del
+// dibujado, como efectos secundarios (guardar en disco, pedir datos...).
+// Los dos se importan desde 'react'.
+import { useState, useEffect } from 'react'
 // SubmitEvent es el TIPO del evento que dispara un formulario al enviarse.
 // Lo importamos con "type" porque es solo un tipo de TypeScript.
 import type { SubmitEvent } from 'react'
@@ -20,6 +22,63 @@ import type { Materia } from '../../types'
 // Importamos los estilos del componente. Con Vite, importar un .css
 // hace que esos estilos se apliquen a la página.
 import './App.css'
+
+// ============================================================
+// PERSISTENCIA con localStorage
+// ============================================================
+// localStorage es un almacén clave→valor que el NAVEGADOR guarda en
+// el disco, por sitio web. A diferencia del estado de React (que vive
+// en memoria y muere al recargar), lo que guardás acá sobrevive a
+// recargas y a cerrar el navegador. Solo guarda STRINGS, por eso
+// usamos JSON.stringify (objeto → texto) y JSON.parse (texto → objeto).
+
+// La clave bajo la que guardamos todo. Constante para no escribir
+// el string a mano en dos lugares (y evitar errores de tipeo).
+const CLAVE_STORAGE = 'gestor-materias'
+
+// Calcula el estado INICIAL de las materias:
+// - Si hay datos guardados de una sesión anterior → restauramos los
+//   ESTADOS guardados sobre el plan actual de materias.ts.
+// - Si no hay nada guardado (primera visita) o los datos están rotos
+//   → arrancamos con materias.ts tal cual.
+//
+// Detalle importante: NO usamos el array guardado entero. Solo le
+// "robamos" el campo estado, y el resto (nombre, previas, semestre...)
+// sale SIEMPRE de materias.ts. ¿Por qué? Porque materias.ts es la
+// fuente de verdad del plan: si mañana corregís un semestre ahí,
+// no queremos que una copia vieja guardada en el navegador lo pise.
+function cargarMaterias(): Materia[] {
+  // try/catch: si CUALQUIER línea de adentro explota (JSON inválido,
+  // localStorage bloqueado, etc.), saltamos al catch y devolvemos el
+  // plan por defecto. La app nunca se rompe por datos corruptos.
+  try {
+    // getItem devuelve el string guardado, o null si no existe la clave.
+    const guardado = localStorage.getItem(CLAVE_STORAGE)
+    if (guardado === null) {
+      return materiasIniciales // primera visita: no hay nada guardado
+    }
+
+    // JSON.parse convierte el texto de vuelta a un array de objetos.
+    // Si el texto está corrupto, ACÁ se lanza el error → catch.
+    const guardadas = JSON.parse(guardado) as Materia[]
+
+    // Lista de estados válidos, para descartar valores corruptos
+    // (localStorage lo puede editar cualquiera desde las DevTools).
+    const estadosValidos = ['sin aprobar', 'cursando', 'aprobado']
+
+    // Por cada materia del plan actual, buscamos si había un estado
+    // guardado para ese código y, si es válido, lo aplicamos.
+    return materiasIniciales.map((m) => {
+      const g = guardadas.find((x) => x.codigo === m.codigo)
+      return g && estadosValidos.includes(g.estado)
+        ? { ...m, estado: g.estado } // restauramos SOLO el estado
+        : m
+    })
+  } catch {
+    // Datos rotos → como si no hubiera nada guardado.
+    return materiasIniciales
+  }
+}
 
 // Componente principal de la app.
 function App() {
@@ -50,11 +109,36 @@ function App() {
   // REDIBUJAR la pantalla — y React solo redibuja cuando cambia un
   // estado (useState). Un array importado es "invisible" para React.
   //
-  // Por eso: useState(materiasIniciales) crea el estado "materias"
-  // usando el array importado como valor de ARRANQUE. A partir de acá,
-  // la app entera lee de "materias" (el estado) y lo cambia SOLO con
-  // setMaterias. El archivo materias.ts queda como la foto inicial.
-  const [materias, setMaterias] = useState(materiasIniciales)
+  // El estado "materias" ahora arranca con lo que diga cargarMaterias():
+  // lo guardado en localStorage si existe, o materias.ts si no.
+  //
+  // Ojo al detalle: pasamos la FUNCIÓN (useState(cargarMaterias)),
+  // NO su resultado (useState(cargarMaterias())). Se llama "inicializador
+  // perezoso" (lazy initializer): React la ejecuta UNA sola vez, al montar
+  // el componente. Si pusiéramos los paréntesis, leeríamos localStorage
+  // en CADA redibujado — funciona, pero es trabajo inútil.
+  const [materias, setMaterias] = useState(cargarMaterias)
+
+  // ============================================================
+  // useEffect: GUARDAR cada vez que cambian las materias
+  // ============================================================
+  // useEffect ejecuta código DESPUÉS de que React dibuja. Recibe:
+  //   1. una función con el código a ejecutar (el "efecto")
+  //   2. un array de DEPENDENCIAS: [materias] significa "ejecutá el
+  //      efecto solo cuando materias cambie".
+  //
+  // ¿Por qué no guardar directo dentro de cambiarEstado? Se podría,
+  // pero este patrón es más robusto: no importa DESDE DÓNDE cambien
+  // las materias (el select de hoy, un botón de mañana, el backend
+  // de pasado mañana) — este efecto SIEMPRE se entera y guarda.
+  // Es "reactivo": reacciona al dato, no a quién lo tocó.
+  //
+  // El flujo completo queda así:
+  //   usuario elige en el select → setMaterias → React redibuja
+  //   → useEffect ve que materias cambió → guarda en localStorage.
+  useEffect(() => {
+    localStorage.setItem(CLAVE_STORAGE, JSON.stringify(materias))
+  }, [materias])
 
   // Cambia el estado de UNA materia, identificada por su código.
   // Materia['estado'] es un "tipo indexado": le pedimos a TypeScript
