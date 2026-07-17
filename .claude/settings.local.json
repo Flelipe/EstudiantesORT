@@ -1,7 +1,8 @@
 {
   "permissions": {
     "allow": [
-      "PowerShell(npm create vite@latest frontend -- --template react-ts)"
+      "PowerShell(npm create vite@latest frontend -- --template react-ts)",
+      "PowerShell(cd C:\\\\Users\\\\felip\\\\OneDrive\\\\Escritorio\\\\EstudiantesORT\\\\frontend; npx tsc --noEmit -p tsconfig.app.json; if \\($?\\) { \\(Select-String -Path src\\\\data\\\\materias.ts -Pattern \"codigo:\"\\).Count })"
     ]
   }
 }
